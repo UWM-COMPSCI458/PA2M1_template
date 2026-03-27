@@ -26,3 +26,25 @@ jobs:
     - name: Build project
       run: make
       working-directory: ./build/
+
+    - name: Move executable
+      run: mv build/out/$(ls build/out | head -n 1) ./submission
+
+    - name: Get test files
+      run: |
+        wget https://raw.githubusercontent.com/UWM-COMPSCI458/PA2M1_grader/refs/heads/main/tester.sh
+        wget https://github.com/UWM-COMPSCI458/PA2M1_grader/raw/refs/heads/main/reference
+        wget https://github.com/UWM-COMPSCI458/PA2M1_grader/raw/refs/heads/main/assembler
+        chmod +x reference
+        chmod +x assembler
+
+    - name: Run tests
+      uses: UWM-COMPSCI458/autograding-command-grader@main
+      id: pa1m1-tests
+      continue-on-error: true
+      with:
+        test-name: PA2M1 Tests
+        command: "bash"
+        arguments: '["./tester.sh", "./reference", "./submission", "./assembler"]'
+        timeout: 10
+        max-score: 75
